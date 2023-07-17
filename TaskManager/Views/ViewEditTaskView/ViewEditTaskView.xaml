@@ -1,0 +1,168 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ViewModels="clr-namespace:TaskManager.ViewModels.ViewEditTaskViewModel"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon" xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    x:Class="TaskManager.Views.ViewEditTaskView.ViewEditTaskView"
+             mc:Ignorable="d"
+             xmlns:dis="clr-namespace:TaskManager.Models.DISource" xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+    DataContext="{dis:DISource Type=ViewModels:ViewEditTaskViewModel}"
+             MinWidth="600" d:DesignHeight="371.744">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand Event="FrameworkElement.Loaded" Command="{Binding OnViewLoadedAsyncCommand}"/>
+        <dx:DialogService/>
+        <dx:DXMessageBoxService/>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <dxlc:LayoutControl Orientation="Vertical" Padding="0">
+            <dxlc:LayoutItem>
+                <dxr:RibbonControl HorizontalAlignment="Stretch" 
+                           RibbonStyle="Office2019" 
+                           VerticalAlignment="Stretch" ShowApplicationButton="False" MinimizationButtonVisibility="Visible">
+                    <dxr:RibbonPage Caption="Задача">
+                        <dxr:RibbonPageGroup Caption="Навигация">
+                            <dxb:BarButtonItem Content="Назад"                                                  
+                                               LargeGlyph="{dx:DXImage SvgImages/Navigation/Backward.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Navigation/Backward.svg}"
+                                               Command="{Binding GoBackCommand}"
+                                               />
+                        </dxr:RibbonPageGroup>
+                        <dxr:RibbonPageGroup Caption="Изменение"
+                                             IsVisible="{Binding IsEditButtonsVisible}">
+                            <dxb:BarCheckItem Content="Редактировать"
+                                              x:Name="EditCheck"
+                                               LargeGlyph="{dx:DXImage SvgImages/Business Objects/BO_Document.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Business Objects/BO_Document.svg}"
+                                               />
+                            <dxb:BarButtonItem Content="Сохранить"                                               
+                                               LargeGlyph="{dx:DXImage SvgImages/Save/Save.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Save/Save.svg}"
+                                               Command="{Binding SaveTaskAsyncCommand}"
+                                               />
+                            <dxb:BarButtonItem Content="Отменить изменения"                                                
+                                               LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_Rollback.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Rollback.svg}"
+                                               Command="{Binding RestoreTaskAsyncCommand}"
+                                               />
+                            <dxb:BarItemSeparator/>
+                            <dxb:BarButtonItem Content="Удалить"                                                
+                                               LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}"
+                                               Command="{Binding DeleteTaskAsyncCommand}"
+                                               />
+                        </dxr:RibbonPageGroup>
+                        <dxr:RibbonPageGroup Caption="Действия"
+                                             IsVisible="{DXBinding 'IsBeginButtonVisible or IsPauseButtonVisible or IsFinishButtonVisible'}">
+                            <dxb:BarButtonItem Content="В работу" 
+                                               IsVisible="{Binding IsBeginButtonVisible}"
+                                               LargeGlyph="{dx:DXImage SvgImages/Arrows/Next.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Arrows/Next.svg}"
+                                               Command="{Binding SetTaskStatusAsyncCommand}" 
+                                               CommandParameter="1"
+                                               />
+                            <dxb:BarButtonItem Content="Приостановить" 
+                                               IsVisible="{Binding IsPauseButtonVisible}"
+                                               LargeGlyph="{dx:DXImage SvgImages/Arrows/Pause.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Arrows/Pause.svg}"
+                                               Command="{Binding SetTaskStatusAsyncCommand}" 
+                                               CommandParameter="2"
+                                               />
+                            <dxb:BarButtonItem Content="Завершить" 
+                                               IsVisible="{Binding IsFinishButtonVisible}"
+                                               LargeGlyph="{dx:DXImage SvgImages/Business Objects/BO_Validation.svg}" 
+                                               Glyph="{dx:DXImage SvgImages/Business Objects/BO_Validation.svg}"
+                                               Command="{Binding SetTaskStatusAsyncCommand}" 
+                                               CommandParameter="3"
+                                               />
+                        </dxr:RibbonPageGroup>
+                    </dxr:RibbonPage>
+                </dxr:RibbonControl>
+            </dxlc:LayoutItem>
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutGroup Orientation="Vertical">
+                    <dxlc:LayoutItem>
+                        <Label Content="{Binding TaskItem.Identity}" FontWeight="Bold"/>
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem>
+                        <dxe:TextEdit EditValue="{Binding TaskItem.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            <dxe:TextEdit.Style>
+                                <Style TargetType="{x:Type dxe:TextEdit}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{DXBinding '@e(EditCheck).IsChecked'}" Value="False">
+                                            <Setter Property="EditMode" Value="InplaceActive"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </dxe:TextEdit.Style>
+                        </dxe:TextEdit>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+                <dxlc:LayoutGroup VerticalAlignment="Stretch">
+                    <dxlc:LayoutGroup Orientation="Vertical"                                       
+                                      VerticalAlignment="Stretch">
+                        <dxlc:LayoutGroup View="GroupBox"
+                                          VerticalAlignment="Top"
+                                          Header="Описание">
+                            <dxlc:LayoutItem VerticalAlignment="Stretch">
+                                <dxe:TextEdit EditValue="{Binding TaskItem.Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                              VerticalAlignment="Stretch"                                              
+                                              VerticalContentAlignment="Top"
+                                              MinHeight="100"
+                                              VerticalScrollBarVisibility="Auto"
+                                              AcceptsReturn="True"
+                                              TextWrapping="Wrap">
+                                    <dxe:TextEdit.Style>
+                                        <Style TargetType="dxe:TextEdit">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{DXBinding '@e(EditCheck).IsChecked'}" Value="False">
+                                                    <Setter Property="EditMode" Value="InplaceActive"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </dxe:TextEdit.Style>
+                                </dxe:TextEdit>
+                            </dxlc:LayoutItem>
+                        </dxlc:LayoutGroup>
+                    </dxlc:LayoutGroup>
+                    <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutGroup Orientation="Vertical" 
+                                  Width="250"
+                                  Header="Статус" 
+                                  View="GroupBox">
+                            <dxlc:LayoutItem>
+                                <dxg:LookUpEdit EditValue="{Binding TaskItem.StatusId, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                ItemsSource="{Binding TaskStatuses}"
+                                                EditMode="InplaceInactive"
+                                                ShowEditorButtons="False"
+                                                DisplayMember="Name"
+                                                ValueMember="Id"
+                                                />
+                            </dxlc:LayoutItem>
+                        </dxlc:LayoutGroup>
+                        <dxlc:LayoutGroup Orientation="Vertical" 
+                                  Width="250"
+                                  Header="Даты" 
+                                  View="GroupBox">
+                            <dxlc:LayoutItem Label="Дата создания:">
+                                <dxe:DateEdit EditValue="{Binding TaskItem.Created}"
+                                              EditMode="InplaceInactive"
+                                              ShowEditorButtons="False"
+                                              MaskUseAsDisplayFormat="True"
+                                              Mask="dd.MM.yyyy HH:mm:ss"/>
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Дата завершения:">
+                                <dxe:DateEdit EditValue="{Binding TaskItem.Finished, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                              EditMode="InplaceInactive"
+                                              ShowEditorButtons="False"
+                                              MaskUseAsDisplayFormat="True"
+                                              Mask="dd.MM.yyyy HH:mm:ss"/>
+                            </dxlc:LayoutItem>
+                        </dxlc:LayoutGroup>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</UserControl>

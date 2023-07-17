@@ -1,0 +1,49 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ViewModels="clr-namespace:TaskManager.ViewModels.CreateTaskViewModel" xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" x:Class="TaskManager.Views.CreateTaskView.CreateTaskView"
+             mc:Ignorable="d"
+             xmlns:dis="clr-namespace:TaskManager.Models.DISource"
+             DataContext="{dis:DISource Type=ViewModels:CreateTaskViewModel}"
+             Height="300" Width="500">
+    <dxmvvm:Interaction.Behaviors>
+        <dx:CurrentDialogService/>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <dxlc:LayoutControl Orientation="Vertical"
+                            x:Name="ValidationContainer"
+                            dxe:ValidationService.IsValidationContainer="True"
+                            dxe:ValidationService.AllowAccessibilityAlerts="True"
+                            >
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutItem Label="Название" LabelPosition="Top">
+                    <dxe:TextEdit EditValue="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                  InvalidValueBehavior="AllowLeaveEditor"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Описание" LabelPosition="Top" VerticalAlignment="Stretch">
+                    <dxe:TextEdit TextWrapping="Wrap" 
+                                  VerticalContentAlignment="Top"
+                                  EditValue="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                  InvalidValueBehavior="AllowLeaveEditor"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+            <dxlc:LayoutGroup Orientation="Horizontal" VerticalAlignment="Bottom">
+                <dxlc:LayoutItem HorizontalAlignment="Left" Width="150">
+                    <dx:SimpleButton Content="Создать" 
+                                     Command="{Binding CreateTaskCommand}"   
+                                     IsEnabled="{Binding Path=(dxe:ValidationService.HasValidationError), ElementName=ValidationContainer, Converter={dx:NegationConverter}}"
+                                     Glyph="{dx:DXImage SvgImages/Business Objects/BO_Validation.svg}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem HorizontalAlignment="Right" Width="150">
+                    <dx:SimpleButton Content="Отмена"                                      
+                                     IsDefault="True"                                     
+                                     Command="{Binding CloseDialogCommand}" 
+                                     Glyph="{dx:DXImage SvgImages/DiagramIcons/del.svg}"/>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</UserControl>
